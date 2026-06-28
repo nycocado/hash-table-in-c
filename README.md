@@ -1,37 +1,39 @@
 # hash-table-in-c
 
-Hash table com hashing aberto (open addressing) em C — insert, remove, get e rehash para a disciplina de Programação e Algoritmos.
+Hash table with open addressing in C — insert, remove, get, and rehash for the Programming and Algorithms course.
 
 [![License: MIT](https://img.shields.io/badge/License-MIT-3da639.svg)](LICENSE)
-![Status](https://img.shields.io/badge/status-concluído-6f42c1)
+![Status](https://img.shields.io/badge/status-completed-6f42c1)
 
 [![C](https://img.shields.io/badge/C-00599C?logo=c&logoColor=white)](https://en.cppreference.com/w/c)
 [![Make](https://img.shields.io/badge/Make-4495D5?logo=make&logoColor=white)](https://www.gnu.org/software/make/)
 
-## Sobre
+[Portuguese](README.pt.md) | English
 
-Implementação de uma hash table com hashing aberto e chaining para resolução de colisões. Inclui funções de insert, remove, get, rehash dinâmico, iterador sobre chaves e valores, e suite de testes unitários.
+## About
 
-## Requisitos
+Implementation of a hash table with open addressing and chaining for collision resolution. Includes insert, remove, get, dynamic rehash functions, iterator over keys and values, and a unit test suite.
 
-| Ferramenta | Versão mínima |
-| ---------- | ------------- |
-| GCC        | 9+            |
-| Make       | 4+            |
+## Requirements
 
-## Como executar
+| Tool | Minimum version |
+| ---- | --------------- |
+| GCC  | 9+              |
+| Make | 4+              |
+
+## How to run
 
 ```bash
-make        # compila
-make test   # compila e executa a suite de testes
+make        # compiles
+make test   # compiles and runs the test suite
 ```
 
-O código fonte está em `src/` e os testes em `test/`.
+Source code is in `src/` and tests in `test/`.
 
-## Licença
+## License
 
-Distribuído sob a licença **MIT**, © 2024 Nycolas Souza.
+Distributed under the **MIT** license, © 2024 Nycolas Souza.
 
-É uma licença permissiva: qualquer pessoa pode usar, copiar, modificar e distribuir o código, inclusive em projetos comerciais, desde que mantenha o aviso de copyright e o texto da licença.
+It is a permissive license: anyone can use, copy, modify, and distribute the code, including in commercial projects, as long as the copyright notice and license text are retained.
 
-O texto completo está em [LICENSE](LICENSE).
+The full text is in [LICENSE](LICENSE).
