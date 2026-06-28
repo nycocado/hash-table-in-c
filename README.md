@@ -12,13 +12,21 @@ Hash table com hashing aberto (open addressing) em C — insert, remove, get e r
 
 Implementação de uma hash table com hashing aberto e chaining para resolução de colisões. Inclui funções de insert, remove, get, rehash dinâmico, iterador sobre chaves e valores, e suite de testes unitários.
 
+## Requisitos
+
+| Ferramenta | Versão mínima |
+| ---------- | ------------- |
+| GCC        | 9+            |
+| Make       | 4+            |
+
 ## Como executar
 
 ```bash
-make
+make        # compila
+make test   # compila e executa a suite de testes
 ```
 
-Executa a suite de testes. O código fonte está em `src/` e os testes em `test/`.
+O código fonte está em `src/` e os testes em `test/`.
 
 ## Licença
 
