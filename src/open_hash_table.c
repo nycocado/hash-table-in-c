@@ -1,83 +1,111 @@
+#include "hash_table.h"
+#include "list.h"
 #include <stdbool.h>
 #include <stdlib.h>
 #include <string.h>
-#include "hash_table.h"
-#include "list.h"
 
-// Definições de tipos de dados
-typedef struct _Item *Item;
-typedef int (*Hash)(void *, int);
-typedef bool (*Key_Equal)(void *, void *);
+// Data type definitions
+typedef struct _Item* Item;
+typedef int (*Hash)(void*, int);
+typedef bool (*Key_Equal)(void*, void*);
 
-// Estruturas de dados
+// Data structures
 struct _HashTable
 {
-    int size;
-    int arr;
-    Hash hash;
-    Key_Equal key_equal;
-    List *list;
+        int size;
+        int arr;
+        Hash hash;
+        Key_Equal key_equal;
+        List* list;
 };
 
 struct _Item
 {
-    void *key;
-    void *value;
+        void* key;
+        void* value;
 };
 
-// Funções de Apoio
-int default_hash(void *key, int n) // Função padrão para calcular a hash - O(n) - n sendo o número de caracteres
+// Helper functions
+int default_hash(
+    void* key,
+    int n
+) // Default hash function - O(n) - n is character count
 {
-    int result = 0;                                // Initializa o resultado
-    int a = 127;                                   // 127 é um número primo, recomendado para esses tipos de operações
-    for (int i = 0; ((char *)key)[i] != '\0'; i++) // Enquanto tiver caracteres
+    int result = 0; // Initializes result
+    int a =
+        127; // 127 is a prime number, recommended for this kind of operation
+    for (int i = 0; ((char*)key)[i] != '\0'; i++) // While there are characters
     {
-        result = (result * a + ((char *)key)[i]); // Vai fazer a operação matemática
+        result = (result * a + ((char*)key)[i]); // Performs the math operation
     }
-    return result % n; // Resultado do indíce
+    return result % n; // Returns the index
 }
 
-bool default_key_equal(void *key1, void *key2) // Função padrão para comparar chaves - O(1)
+bool default_key_equal(
+    void* key1,
+    void* key2
+) // Default key comparison function - O(1)
 {
-    return strcmp((char *)key1, (char *)key2) == 0;
+    return strcmp((char*)key1, (char*)key2) == 0;
 }
 
-// Funções de HashTable
-HashTable hash_table_create(int size, int (*hash)(void *, int), bool (*key_equal)(void *, void *)) // O(n) - no pior caso
+// HashTable functions
+HashTable hash_table_create(
+    int size,
+    int (*hash)(void*, int),
+    bool (*key_equal)(void*, void*)
+) // O(n) - worst case
 {
-    HashTable htable = malloc(sizeof(struct _HashTable)); // Aloca memória para a hash table
-    htable->arr = size <= 0 ? DEFAULT_SIZE : size;        // Se o tamanho for menor ou igual a zero, usa o tamanho padrão
-    htable->list = malloc(sizeof(List) * htable->arr);    // Aloca memória para o array de listas
-    for (int i = 0; i < htable->arr; i++)                 // Para cada espaço do array
+    HashTable htable = malloc(
+        sizeof(struct _HashTable)
+    ); // Allocates memory for the hash table
+    htable->arr =
+        size <= 0 ? DEFAULT_SIZE : size; // If size is 0 or less, use default
+    htable->list =
+        malloc(sizeof(List) * htable->arr); // Allocates array of lists
+    for (int i = 0; i < htable->arr; i++)   // For each array slot
     {
-        htable->list[i] = list_create(); // Cria uma lista
+        htable->list[i] = list_create(); // Creates a list
     }
-    htable->hash = hash == NULL ? default_hash : hash;                     // Atribui a função de hash, se for nula, usa a padrão
-    htable->key_equal = key_equal == NULL ? default_key_equal : key_equal; // Atribui a função de comparação de chaves, se for nula, usa a padrão
-    htable->size = 0;                                                      // Inicializa o tamanho
-    return htable;                                                         // Retorna a hash table
+    htable->hash = hash == NULL
+                       ? default_hash
+                       : hash; // Assigns hash function, uses default if NULL
+    htable->key_equal =
+        key_equal == NULL
+            ? default_key_equal
+            : key_equal; // Assigns key comparison, uses default if NULL
+    htable->size = 0;    // Initializes size
+    return htable;       // Returns the hash table
 }
 
-void hash_table_destroy(HashTable htable, void (*key_destroy)(void *), void (*value_destroy)(void *)) // O(n²) - no pior caso
+void hash_table_destroy(
+    HashTable htable,
+    void (*key_destroy)(void*),
+    void (*value_destroy)(void*)
+) // O(n²) - worst case
 {
-    void destroy_assistent(void *element) // Função interna para destruir os elementos da hash table
+    void destroy_assistent(
+        void* element
+    ) // Internal helper to destroy hash table elements
     {
-        if (key_destroy != NULL) // Se a função de destruição de chaves não for nula
+        if (key_destroy != NULL) // If key destroy function is not NULL
         {
-            key_destroy(((Item)element)->key); // Destrói a chave
+            key_destroy(((Item)element)->key); // Destroys the key
         }
-        if (value_destroy != NULL) // Se a função de destruição de valores não for nula
+        if (value_destroy != NULL) // If value destroy function is not NULL
         {
-            value_destroy(((Item)element)->value); // Destrói o valor
+            value_destroy(((Item)element)->value); // Destroys the value
         }
-        free(element); // Destrói o item
+        free(element); // Destroys the item
     }
-    for (int i = 0; i < htable->arr; i++) // Para cada espaço do array
+    for (int i = 0; i < htable->arr; i++) // For each array slot
     {
-        list_destroy(htable->list[i], destroy_assistent); // Destrói a lista, passando a função de destruição
+        list_destroy(
+            htable->list[i], destroy_assistent
+        ); // Destroys list with destroy callback
     }
-    free(htable->list); // Destrói o array de listas
-    free(htable);       // Destrói a hash table
+    free(htable->list); // Destroys the array of lists
+    free(htable);       // Destroys the hash table
 }
 
 bool hash_table_is_empty(HashTable htable) // O(1)
@@ -90,109 +118,145 @@ int hash_table_size(HashTable htable) // O(1)
     return htable->size;
 }
 
-void *hash_table_insert(HashTable htable, void *key, void *value) // O(n) - no pior caso
+void* hash_table_insert(
+    HashTable htable,
+    void* key,
+    void* value
+) // O(n) - worst case
 {
-    int index = htable->hash(key, htable->arr);         // Calcula o indíce
-    list_iterator_start(htable->list[index]);           // Inicia o iterador
-    while (list_iterator_has_next(htable->list[index])) // Enquanto tiver próximo
+    int index = htable->hash(key, htable->arr);         // Calculates the index
+    list_iterator_start(htable->list[index]);           // Starts the iterator
+    while (list_iterator_has_next(htable->list[index])) // While there is a next
     {
-        Item listItem = list_iterator_get_next(htable->list[index]); // Pega o item atual e passa para a próxima
-        if (htable->key_equal(listItem->key, key))                   // Se a chave for igual
+        Item listItem = list_iterator_get_next(
+            htable->list[index]
+        ); // Gets current item and advances
+        if (htable->key_equal(listItem->key, key)) // If keys match
         {
-            void *oldValue = listItem->value; // Salva o valor antigo
-            listItem->value = value;          // Atualiza o valor
-            return oldValue;                  // Retorna o valor antigo
+            void* oldValue = listItem->value; // Saves old value
+            listItem->value = value;          // Updates the value
+            return oldValue;                  // Returns old value
         }
     }
-    // Se não tiver a chave
-    Item item = malloc(sizeof(struct _Item));    // Aloca memória para o item
-    item->key = key;                             // Atribui a chave
-    item->value = value;                         // Atribui o valor
-    list_insert_last(htable->list[index], item); // Insere o item na lista
-    htable->size++;                              // Incrementa o tamanho
-    return NULL;                                 // Retorna nulo
+    // Key not found
+    Item item = malloc(sizeof(struct _Item));    // Allocates item memory
+    item->key = key;                             // Assigns the key
+    item->value = value;                         // Assigns the value
+    list_insert_last(htable->list[index], item); // Inserts item into list
+    htable->size++;                              // Increments size
+    return NULL;                                 // Returns NULL
 }
 
-void *hash_table_remove(HashTable htable, void *key) // O(n) - no pior caso (é melhor fazer n + n do que copiar aquela estrutura inteira do list remove all na minha opinião, a manutenção do código é mais simples)
+void* hash_table_remove(
+    HashTable htable,
+    void* key
+) // O(n) - worst case (better to do n + n than copy the entire list_remove_all
+  // structure, code is easier to maintain)
 {
-    int index = htable->hash(key, htable->arr);        // Calcula o indíce
-    bool key_equal_assistent(void *key, void *element) // Função interna para comparar chaves
+    int index = htable->hash(key, htable->arr); // Calculates the index
+    bool key_equal_assistent(
+        void* key, void* element
+    ) // Internal key comparison helper
     {
         return htable->key_equal(key, ((Item)element)->key);
     }
-    int position = list_find(htable->list[index], key_equal_assistent, key); // Procura a posição do elemento, passando a função de comparação e a chave
-    if (position != -1)                                                      // Se a posição for diferente de -1
+    int position = list_find(
+        htable->list[index], key_equal_assistent, key
+    );                  // Finds element position with comparison function
+    if (position != -1) // If position is valid
     {
-        Item item = list_remove(htable->list[index], position); // Remove o item
-        void *value = item->value;                              // Salva o valor
-        free(item);                                             // Destrói o item
-        htable->size--;                                         // Decrementa o tamanho
-        return value;                                           // Retorna o valor
+        Item item =
+            list_remove(htable->list[index], position); // Removes the item
+        void* value = item->value;                      // Saves the value
+        free(item);                                     // Destroys the item
+        htable->size--;                                 // Decrements size
+        return value;                                   // Returns the value
     }
-    return NULL; // Caso não encontre, retorna nulo
+    return NULL; // Key not found
 }
 
-void *hash_table_get(HashTable htable, void *key) // O(n) - no pior caso
+void* hash_table_get(HashTable htable, void* key) // O(n) - worst case
 {
-    int index = htable->hash(key, htable->arr);         // Calcula o indíce
-    list_iterator_start(htable->list[index]);           // Inicia o iterador
-    while (list_iterator_has_next(htable->list[index])) // Enquanto tiver próximo
+    int index = htable->hash(key, htable->arr);         // Calculates the index
+    list_iterator_start(htable->list[index]);           // Starts the iterator
+    while (list_iterator_has_next(htable->list[index])) // While there is a next
     {
-        Item item = list_iterator_get_next(htable->list[index]); // Pega o item atual e passa para o próximo
-        if (htable->key_equal(key, item->key))                   // Se a chave for igual
+        Item item = list_iterator_get_next(
+            htable->list[index]
+        );                                     // Gets current item and advances
+        if (htable->key_equal(key, item->key)) // If keys match
         {
-            return item->value; // Retorna o valor
+            return item->value; // Returns the value
         }
     }
-    return NULL; // Retorna nulo
+    return NULL; // Returns NULL
 }
 
-List hash_table_keys(HashTable htable) // O(n²) - no pior caso
+List hash_table_keys(HashTable htable) // O(n²) - worst case
 {
-    List list = list_create();            // Cria uma lista
-    for (int i = 0; i < htable->arr; i++) // Para cada espaço do array
+    List list = list_create();            // Creates a list
+    for (int i = 0; i < htable->arr; i++) // For each array slot
     {
-        list_iterator_start(htable->list[i]);           // Inicia o iterador
-        while (list_iterator_has_next(htable->list[i])) // Enquanto tiver próximo
+        list_iterator_start(htable->list[i]);           // Starts the iterator
+        while (list_iterator_has_next(htable->list[i])) // While there is a next
         {
-            Item item = list_iterator_get_next(htable->list[i]); // Pega o item atual e passa para o próximo
-            list_insert_last(list, item->key);                   // Insere a chave na lista
+            Item item = list_iterator_get_next(
+                htable->list[i]
+            );                                 // Gets current item and advances
+            list_insert_last(list, item->key); // Inserts key into list
         }
     }
-    return list; // Retorna a lista
+    return list; // Returns the list
 }
 
-List hash_table_values(HashTable htable) // O(n²) - no pior caso
+List hash_table_values(HashTable htable) // O(n²) - worst case
 {
-    List list = list_create();            // Cria uma lista
-    for (int i = 0; i < htable->arr; i++) // Para cada espaço do array
+    List list = list_create();            // Creates a list
+    for (int i = 0; i < htable->arr; i++) // For each array slot
     {
-        list_iterator_start(htable->list[i]);           // Inicia o iterador
-        while (list_iterator_has_next(htable->list[i])) // Enquanto tiver próximo
+        list_iterator_start(htable->list[i]);           // Starts the iterator
+        while (list_iterator_has_next(htable->list[i])) // While there is a next
         {
-            Item item = list_iterator_get_next(htable->list[i]); // Pega o item atual e passa para o próximo
-            list_insert_last(list, item->value);                 // Insere o valor na lista
+            Item item = list_iterator_get_next(
+                htable->list[i]
+            ); // Gets current item and advances
+            list_insert_last(list, item->value); // Inserts value into list
         }
     }
-    return list; // Retorna a lista
+    return list; // Returns the list
 }
 
-HashTable hash_table_rehash(HashTable htable, int new_size, void (*key_destroy)(void *), void (*value_destroy)(void *))
+HashTable hash_table_rehash(
+    HashTable htable,
+    int new_size,
+    void (*key_destroy)(void*),
+    void (*value_destroy)(void*)
+)
 {
-    if (new_size > 0) // Se o novo tamanho for maior que zero
+    if (new_size > 0) // If new size is valid
     {
-        HashTable htableNew = hash_table_create(new_size, htable->hash, htable->key_equal); // Cria uma nova hash table
-        for (int i = 0; i < htable->arr; i++)                                               // Para cada espaço do array
+        HashTable htableNew = hash_table_create(
+            new_size, htable->hash, htable->key_equal
+        );                                    // Creates new hash table
+        for (int i = 0; i < htable->arr; i++) // For each array slot
         {
-            list_iterator_start(htable->list[i]);           // Inicia o iterador
-            while (list_iterator_has_next(htable->list[i])) // Enquanto tiver próximo
+            list_iterator_start(htable->list[i]); // Starts the iterator
+            while (list_iterator_has_next(
+                htable->list[i]
+            )) // While there is a next
             {
-                Item item = list_iterator_get_next(htable->list[i]);  // Pega o item atual e passa para o próximo
-                hash_table_insert(htableNew, item->key, item->value); // Insere o item na nova hash table
+                Item item = list_iterator_get_next(
+                    htable->list[i]
+                ); // Gets current item and advances
+                hash_table_insert(
+                    htableNew, item->key, item->value
+                ); // Inserts item into new hash table
             }
         }
-        hash_table_destroy(htable, key_destroy, value_destroy); // Destrói a hash table antiga
-        return htableNew;                                       // Retorna a nova hash table
+        hash_table_destroy(
+            htable, key_destroy, value_destroy
+        );                // Destroys the old hash table
+        return htableNew; // Returns the new hash table
     }
-    return htable; // Caso o novo tamanho seja menor ou igual a zero, retorna a hash table antiga
+    return htable; // Returns old hash table if size is invalid
 }

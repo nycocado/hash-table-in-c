@@ -14,17 +14,18 @@ char* keys[] = {"key0", "key1", "key2", "key3", "key4"};
 char* values[] = {"value0", "value1", "value2", "value3", "value4"};
 #define NITEMS 5
 
-void setUp() {
-    table = hash_table_create(-1, NULL, NULL);
-}
+void setUp() { table = hash_table_create(-1, NULL, NULL); }
 
-void tearDown() {
-    if (table != NULL) {
+void tearDown()
+{
+    if (table != NULL)
+    {
         hash_table_destroy(table, NULL, NULL);
     }
 }
 
-void test_insert_single_element() {
+void test_insert_single_element()
+{
     TEST_ASSERT_TRUE(hash_table_is_empty(table));
     hash_table_insert(table, keys[0], values[0]);
     TEST_ASSERT_FALSE(hash_table_is_empty(table));
@@ -34,8 +35,10 @@ void test_insert_single_element() {
     TEST_ASSERT_TRUE(hash_table_is_empty(table));
 }
 
-void test_insert_collection() {
-    for (int i = 0; i < NITEMS; i++) {
+void test_insert_collection()
+{
+    for (int i = 0; i < NITEMS; i++)
+    {
         hash_table_insert(table, keys[i], values[i]);
     }
     TEST_ASSERT_EQUAL(values[3], hash_table_get(table, keys[3]));
@@ -43,35 +46,33 @@ void test_insert_collection() {
     TEST_ASSERT_EQUAL_CHAR_ARRAY(value, values[3], 6);
 }
 
-int custom_hash(void* key, int size) {
-    return 0;
-}
+int custom_hash(void* key, int size) { return 0; }
 
-typedef struct {
-    char a;
-    char b;
+typedef struct
+{
+        char a;
+        char b;
 } t_Key, *Key;
 
-bool custom_key_equal(void* key1, void* key2) {
+bool custom_key_equal(void* key1, void* key2)
+{
     Key k1 = (Key)key1;
     Key k2 = (Key)key2;
     return k1->a == k2->a && k1->b == k2->b;
 }
 
-void custom_key_destroy(void* key) {
-    free(key);
-}
+void custom_key_destroy(void* key) { free(key); }
 
-typedef struct {
-    int i;
-    char c;
+typedef struct
+{
+        int i;
+        char c;
 } t_Value, *Value;
 
-void custom_value_destroy(void* value) {
-    free(value);
-}
+void custom_value_destroy(void* value) { free(value); }
 
-void test_custom_table() {
+void test_custom_table()
+{
     hash_table_destroy(table, NULL, NULL);
     table = hash_table_create(10, custom_hash, custom_key_equal);
     Key k0 = malloc(sizeof(t_Key));
@@ -94,8 +95,10 @@ void test_custom_table() {
     table = NULL;
 }
 
-void test_update() {
-    for (int i = 0; i < NITEMS; i++) {
+void test_update()
+{
+    for (int i = 0; i < NITEMS; i++)
+    {
         hash_table_insert(table, keys[i], values[i]);
     }
     char new_value[] = "new_value";
@@ -104,7 +107,8 @@ void test_update() {
     TEST_ASSERT_EQUAL_STRING("new_value", hash_table_get(table, "key3"));
 }
 
-void test_rehash() {
+void test_rehash()
+{
     hash_table_destroy(table, NULL, NULL);
     table = hash_table_create(3, NULL, NULL);
     hash_table_insert(table, keys[0], values[0]);
@@ -119,31 +123,38 @@ void test_rehash() {
     TEST_ASSERT_EQUAL(5, hash_table_size(table));
 }
 
-void test_key_collection() {
-    for (int i = 0; i < NITEMS; i++) {
+void test_key_collection()
+{
+    for (int i = 0; i < NITEMS; i++)
+    {
         hash_table_insert(table, keys[i], values[i]);
     }
     List key_list = hash_table_keys(table);
     TEST_ASSERT_EQUAL(NITEMS, list_size(key_list));
-    for (int i = 0; i < NITEMS; i++) {
+    for (int i = 0; i < NITEMS; i++)
+    {
         TEST_ASSERT_EQUAL_STRING(keys[i], list_get(key_list, i));
     }
     list_destroy(key_list, NULL);
 }
 
-void test_value_collection() {
-    for (int i = 0; i < NITEMS; i++) {
+void test_value_collection()
+{
+    for (int i = 0; i < NITEMS; i++)
+    {
         hash_table_insert(table, keys[i], values[i]);
     }
     List value_list = hash_table_values(table);
     TEST_ASSERT_EQUAL(NITEMS, list_size(value_list));
-    for (int i = 0; i < NITEMS; i++) {
+    for (int i = 0; i < NITEMS; i++)
+    {
         TEST_ASSERT_EQUAL_STRING(values[i], list_get(value_list, i));
     }
     list_destroy(value_list, NULL);
 }
 
-int main() {
+int main()
+{
     UNITY_BEGIN();
     RUN_TEST(test_insert_single_element);
     RUN_TEST(test_insert_collection);

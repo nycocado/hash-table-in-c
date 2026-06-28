@@ -1,61 +1,62 @@
-#include <stdlib.h>
-#include <stdbool.h>
 #include "list.h"
+#include <stdbool.h>
+#include <stdlib.h>
 
-typedef struct Node_ *Node;
+typedef struct Node_* Node;
 
 struct Node_
 {
-    void *element;
-    Node next;
-}; // Struct = struct Node_ ; Ponteiro = Node
+        void* element;
+        Node next;
+}; // Struct = struct Node_ ; Pointer = Node
 
 struct List_
 {
-    Node head;
-    Node tail;
-    int size;
-    Node current;
-}; // Struct = struct List_ ; Ponteiro = List
+        Node head;
+        Node tail;
+        int size;
+        Node current;
+}; // Struct = struct List_ ; Pointer = List
 
-Node node_create(Node next, void *element) // O(1)
+Node node_create(Node next, void* element) // O(1)
 {
-    Node node = malloc(sizeof(struct Node_)); // Aloca memória para o node
-    node->element = element;                  // Atribui o endereço do elemento
-    node->next = next;                        // Atribui o endereço do next
+    Node node = malloc(sizeof(struct Node_)); // Allocates memory for the node
+    node->element = element;                  // Assigns element address
+    node->next = next;                        // Assigns next address
     return node;
-    // Me da imenso jeito pois vou usar a função pelo menos umas 3 vezes
+    // Useful since this function is called at least 3 times
 }
 
 List list_create() // O(1)
 {
-    List list = malloc(sizeof(struct List_)); // Aloca memória para a lista
-    list->head = NULL;                        // Atribui nenhum endereço para head
-    list->tail = NULL;                        // Atribui nenhum endereço para tail
-    list->size = 0;                           // Atribui o tamanho da lista para 0
+    List list = malloc(sizeof(struct List_)); // Allocates memory for the list
+    list->head = NULL;                        // Sets head to NULL
+    list->tail = NULL;                        // Sets tail to NULL
+    list->size = 0;                           // Sets size to 0
     return list;
 }
 
-void list_wipe(List list, void (*free_element)(void *)) // O(n)
+void list_wipe(List list, void (*free_element)(void*)) // O(n)
 {
-    Node node = list->head; // Recebe o endereço do node da head
-    while (node != NULL)    // Vai da head até a tail
+    Node node = list->head; // Gets node address from head
+    while (node != NULL)    // Traverses from head to tail
     {
-        if (free_element != NULL) // Nem todo elemento em um código necessita de limpeza (descobri isso 4 da manha depois de apanhar pros testes)
+        if (free_element != NULL) // Not every element needs cleanup (discovered
+                                  // this at 4am after struggling with tests)
         {
-            free_element(node->element); // Limpa o elemento
+            free_element(node->element); // Cleans the element
         }
-        Node previousNode = node; // Guarda o elemento da node antiga
-        node = node->next;        // E avança para uma nova
-        free(previousNode);       // Limpa a node antiga
+        Node previousNode = node; // Saves the old node
+        node = node->next;        // Advances to the next
+        free(previousNode);       // Cleans the old node
     }
-    // É outra função que me da jeito, pois uso duas vezes
+    // Another useful function, used twice
 }
 
-void list_destroy(List list, void (*free_element)(void *)) // O(n)
+void list_destroy(List list, void (*free_element)(void*)) // O(n)
 {
-    list_wipe(list, free_element); // Limpo os nodes e elementos da lista
-    free(list);                    // E por fim, limpa a lista
+    list_wipe(list, free_element); // Cleans the nodes and elements of the list
+    free(list);                    // Finally, cleans the list
 }
 
 bool list_is_empty(List list) // O(1)
@@ -68,395 +69,466 @@ int list_size(List list) // O(1)
     return list->size;
 }
 
-void *list_get_first(List list) // O(1)
+void* list_get_first(List list) // O(1)
 {
-    if (list_is_empty(list)) // Se não tiver nada na lista
+    if (list_is_empty(list)) // If the list is empty
     {
-        return NULL; // (Ou seja, não tem nenhum elemento definido)
+        return NULL; // (i.e., no element is defined)
     }
     return list->head->element;
 }
 
-void *list_get_last(List list) // O(1)
+void* list_get_last(List list) // O(1)
 {
-    if (list_is_empty(list)) // Se não tiver nada na lista
+    if (list_is_empty(list)) // If the list is empty
     {
-        return NULL; // (Ou seja, não tem nenhum elemento definido)
+        return NULL; // (i.e., no element is defined)
     }
     return list->tail->element;
 }
 
-void *list_get(List list, int position) // O(n)
+void* list_get(List list, int position) // O(n)
 {
-    if (position > list_size(list) - 1 || position < 0) // Não pode acessar posições que não existem
+    if (position > list_size(list) - 1 ||
+        position < 0) // Cannot access positions that do not exist
     {
         return NULL;
     }
-    Node node = list->head;            // A node criada recebe o endereço da head
-    for (int i = 0; i < position; i++) // E anda até a posição desejada
+    Node node = list->head;            // Created node receives the head address
+    for (int i = 0; i < position; i++) // Walks to the desired position
     {
-        node = node->next; // Anda para frente
+        node = node->next; // Moves forward
     }
     return node->element;
 }
 
-int list_find(List list, bool (*equal)(void *, void *), void *element) // O(n)
+int list_find(List list, bool (*equal)(void*, void*), void* element) // O(n)
 {
-    Node node = list->head;            // O node recebe o endereço da head
-    for (int i = 0; node != NULL; i++) // Vai do primeiro ao último node da lista
+    Node node = list->head;            // Node receives head address
+    for (int i = 0; node != NULL; i++) // Traverses from first to last node
     {
-        if (equal(element, node->element)) // Se os elementos forem iguais
+        if (equal(element, node->element)) // If elements are equal
         {
-            return i; // Devolve a posição
+            return i; // Returns position
         }
-        node = node->next; // Node recebe o endereço do próximo
+        node = node->next; // Node receives the next address
     }
     return -1;
 }
 
-void list_insert_first(List list, void *element) // O(1)
+void list_insert_first(List list, void* element) // O(1)
 {
-    Node node = node_create(list->head, element); // Cria um node
-    list->head = node;                            // E manda para a head
-    if (list_is_empty(list))                      // Caso a lista esteja vazia
+    Node node = node_create(list->head, element); // Creates a node
+    list->head = node;                            // Sets as head
+    if (list_is_empty(list))                      // If the list is empty
     {
-        list->tail = node; // A tail tambem recebe o node
+        list->tail = node; // Tail also receives the node
     }
-    list->size++; // Sobe o tamanho da lista
-    // Se não tiver nada na lista, é obvio que o endereço do next da head é NULL, logo, tanto a tail quanto a head nesse primeiro elemento, tem o next é definido como NULL
+    list->size++; // Increments list size
+    // If the list is empty, the next of the head is obviously NULL, so both
+    // tail and head for this first element have next defined as NULL
 }
 
-void list_insert_last(List list, void *element) // O(1)
+void list_insert_last(List list, void* element) // O(1)
 {
-    Node node = node_create(NULL, element); // Cria um node
-    if (list_is_empty(list))                // Caso a lista esteja vazia
+    Node node = node_create(NULL, element); // Creates a node
+    if (list_is_empty(list))                // If the list is empty
     {
-        list->head = node; // A head tambem recebe o node
+        list->head = node; // Head also receives the node
     }
-    else // Caso não
+    else // Otherwise
     {
-        list->tail->next = node; // A tail passa a apontar para node no next
+        list->tail->next = node; // Tail's next points to node
     }
-    list->tail = node; // E o node vira o novo tail
-    list->size++;      // Sobe o número da lista
+    list->tail = node; // Node becomes the new tail
+    list->size++;      // Increments list size
 }
 
-void list_insert(List list, void *element, int position) // O(n)
+void list_insert(List list, void* element, int position) // O(n)
 {
-    if (position < 0 || position > list_size(list)) // Não pode inserir em posições que não existem
+    if (position < 0 ||
+        position >
+            list_size(list)) // Cannot insert at positions that do not exist
     {
         return;
     }
-    if (position == 0) // Caso a posição seja da head, ela insere no começo e quebra a função
+    if (position ==
+        0) // If position is head, inserts at the beginning and returns
     {
         list_insert_first(list, element);
         return;
     }
-    if (position == list_size(list)) // Caso a posição seja na tail, ela insere no final e quebra a função
+    if (position ==
+        list_size(list)) // If position is tail, inserts at the end and returns
     {
         list_insert_last(list, element);
         return;
     }
-    Node previousNode = list->head->next;  // Recebe o endereço da head
-    for (int i = 1; i < position - 1; i++) // Vai uma node depois da head até o valor anterior da posição
+    Node previousNode = list->head->next; // Receives the head address
+    for (int i = 1; i < position - 1;
+         i++) // Moves one node after head up to the node before the position
     {
-        previousNode = previousNode->next; // Anda para frente
+        previousNode = previousNode->next; // Moves forward
     }
-    Node node = node_create(previousNode->next, element); // A nova node aponta para próxima node (a que estava na posição em que foi colocada)
-    previousNode->next = node;                            // E a node anterior aponta para a nova node
-    list->size++;                                         // Aumenta o tamanho da lista
+    Node node = node_create(
+        previousNode->next, element
+    ); // New node points to the next node (the one previously at the target
+       // position)
+    previousNode->next = node; // Previous node points to the new node
+    list->size++;              // Increases list size
 }
 
-void *list_remove_first(List list) // O(1)
+void* list_remove_first(List list) // O(1)
 {
-    if (list_is_empty(list)) // Se a lista estiver vazia
+    if (list_is_empty(list)) // If the list is empty
     {
-        return NULL; // Não retorna elemento nenhum
+        return NULL; // Returns no element
     }
-    Node node = list->head;        // Guarda o endereço da node da head
-    void *element = node->element; // Guarda o endereço do elemento da head
-    list->head = node->next;       // Define o próximo elemento como a head
-    free(node);                    // Limpa o primeiro elemento
-    list->size--;                  // Diminui o tamanho da lista
-    if (list_is_empty(list))       // Se depois disso ela estiver vazia
+    Node node = list->head;        // Saves the head node address
+    void* element = node->element; // Saves the head element address
+    list->head = node->next;       // Sets next element as head
+    free(node);                    // Frees the first element
+    list->size--;                  // Decrements list size
+    if (list_is_empty(list))       // If the list becomes empty after this
     {
-        list->tail = NULL; // Define a tail como NULL também
+        list->tail = NULL; // Sets tail to NULL as well
     }
-    return element; // Por fim, retorna o endereço do elemento
-    // Novamente, é implicito que se a lista tiver apenas um elemento e fizermos isso, como a head nova recebe o next da head anterior, esse será NULL
+    return element; // Returns the element address
+    // Again, if the list has only one element, the new head receives the next
+    // of the previous head, which will be NULL
 }
 
-void *list_remove_last(List list) // O(n)
+void* list_remove_last(List list) // O(n)
 {
-    if (list_is_empty(list)) // Se a lista estiver vazia
+    if (list_is_empty(list)) // If the list is empty
     {
-        return NULL; // Não retorna elemento nenhum
+        return NULL; // Returns no element
     }
-    if (list->head->next == NULL) // Se o next da head for NULL, ou seja, tem apenas um elemento
+    if (list->head->next ==
+        NULL) // If head's next is NULL, i.e., only one element exists
     {
-        return list_remove_first(list); // Remove o primeiro (É mais fácil e aparentemente me poupa memória e complexidade)
+        return list_remove_first(
+            list
+        ); // Removes the first (easier and saves memory and complexity)
     }
-    Node node = list->head;              // Esse node recebe de primeira instancia o endereço da head
-    void *element = list->tail->element; // Guarda o endereço do element da tail
-    while (node->next->next != NULL)     // Ele avança na lista até que o next do next seja NULL, ou seja, vai até o penúltimo termo da lista
+    Node node = list->head; // This node initially receives the head address
+    void* element = list->tail->element; // Saves the tail element address
+    while (node->next->next != NULL)     // Advances until next->next is NULL,
+                                         // reaching the second-to-last node
     {
-        node = node->next; // Recebe o endereço do próximo
+        node = node->next; // Receives the next address
     }
-    free(list->tail);  // Limpa o node da tail
-    list->tail = node; // Define o penúltimo node como a tail
-    node->next = NULL; // E remove o next do node
-    list->size--;      // Diminui o tamanho da lista
-    return element;    // Retorna o elemento
+    free(list->tail);  // Frees the tail node
+    list->tail = node; // Sets second-to-last node as tail
+    node->next = NULL; // Removes the node's next pointer
+    list->size--;      // Decrements list size
+    return element;    // Returns element
 }
 
-void *list_remove(List list, int position) // O(n)
+void* list_remove(List list, int position) // O(n)
 {
-    if (position < 0 || position > list_size(list) - 1 || list_is_empty(list)) // Não retorna e remove nenhum endereço que não exista na lista
+    if (position < 0 || position > list_size(list) - 1 ||
+        list_is_empty(list)) // Does not return or remove any address that does
+                             // not exist in the list
     {
         return NULL;
     }
-    if (position == 0 || list->head->next == NULL) // Se a posição for 0 ou ele tiver apenas um elemento
+    if (position == 0 ||
+        list->head->next ==
+            NULL) // If position is 0 or list has only one element
     {
-        return list_remove_first(list); // Remove o primeiro
+        return list_remove_first(list); // Removes the first
     }
-    Node previousNode = list->head->next;  // Recebe o endereço seguinte da head
-    for (int i = 1; i < position - 1; i++) // Vai uma node depois da head até o valor anterior da posição
+    Node previousNode = list->head->next; // Receives the address after head
+    for (int i = 1; i < position - 1;
+         i++) // Moves one node after head up to the node before the position
     {
-        previousNode = previousNode->next; // Anda para frente
+        previousNode = previousNode->next; // Moves forward
     }
-    Node node = previousNode->next;  // Guarda o endereço da node que queremos limpar
-    previousNode->next = node->next; // Guarda o endereço da node a seguir da que queremos limpar, unindo assim a lista
-    void *element = node->element;   // Guarda o endereço do elemento da node
-    free(node);                      // Limpa a node
-    list->size--;                    // Diminui o tamanho da lista
-    return element;                  // Retorna o elemento
+    Node node = previousNode->next;  // Saves the address of the node to remove
+    previousNode->next = node->next; // Links the previous node to the next,
+                                     // reconnecting the list
+    void* element = node->element;   // Saves the node's element address
+    free(node);                      // Frees the node
+    list->size--;                    // Decrements list size
+    return element;                  // Returns element
 }
 
-void list_make_empty(List list, void (*free_element)(void *)) // O(n)
+void list_make_empty(List list, void (*free_element)(void*)) // O(n)
 {
-    list_wipe(list, free_element); // Limpo os nodes e elementos da lista
-    list->head = NULL;             // Depois defino tudo como no começo
+    list_wipe(list, free_element); // Cleans the nodes and elements of the list
+    list->head = NULL;             // Resets everything to initial state
     list->tail = NULL;
     list->size = 0;
 }
 
-void list_to_array(List list, void **out_array)
+void list_to_array(List list, void** out_array)
 {
-    Node node = list->head;            // Recebe o endereço da head
-    for (int i = 0; node != NULL; i++) // Percorre do primeiro node até o ponto em que ele se torna nulo
+    Node node = list->head;            // Receives the head address
+    for (int i = 0; node != NULL; i++) // Traverses from first node until null
     {
-        out_array[i] = node->element; // Adiciona o elemento na array
-        node = node->next;            // Avança para o próximo
+        out_array[i] = node->element; // Adds element to the array
+        node = node->next;            // Advances to the next
     }
 }
 
-int list_count_all(List list, bool (*equal)(void *, void *), void *element) // O(n)
+int list_count_all(
+    List list,
+    bool (*equal)(void*, void*),
+    void* element
+) // O(n)
 {
-    Node node = list->head; // Recebe o endereço da head
-    int i = 0;              // Define o counter a 0
-    while (node != NULL)    // Vai do primeiro ao último termo
+    Node node = list->head; // Receives the head address
+    int i = 0;              // Sets counter to 0
+    while (node != NULL)    // Traverses from first to last element
     {
-        if (equal(element, node->element)) // Se for igual
+        if (equal(element, node->element)) // If equal
         {
-            i++; // Acrescenta no counter
+            i++; // Increments counter
         }
-        node = node->next; // Avança na lista
+        node = node->next; // Advances in the list
     }
-    return i; // Retorna o counter
+    return i; // Returns the counter
 }
 
-int list_remove_all(List list, bool (*equal_element)(void *, void *), void (*free_element)(void *), void *element) // O(n) - A mais dificil até então
+int list_remove_all(
+    List list,
+    bool (*equal_element)(void*, void*),
+    void (*free_element)(void*),
+    void* element
+) // O(n) - The hardest one so far
 {
-    int occurrences = 0;      // Inicia o contador de ocorrencias do elemento
-    Node node = list->head;   // Recebe o endereço da head
-    Node previousNode = NULL; // Vai servir mais pra frente para guardar o node anterior
-    while (node != NULL)      // Percorre toda a lista
+    int occurrences = 0;      // Initializes occurrence counter
+    Node node = list->head;   // Receives the head address
+    Node previousNode = NULL; // Will be used later to track the previous node
+    while (node != NULL)      // Traverses the entire list
     {
-        if (equal_element(node->element, element)) // Se o node atual for igual ao elemento
+        if (equal_element(
+                node->element, element
+            )) // If current node equals the element
         {
-            occurrences++;            // Ele acrescenta no contador
-            if (previousNode != NULL) // Se a previousNode for diferente de NULL (ou seja, não estamos na head)
+            occurrences++; // Increments the counter
+            if (previousNode !=
+                NULL) // If previousNode is not NULL (i.e., not at the head)
             {
-                previousNode->next = node->next; // o next do previousNode vai receber o próximo do node (porque vamos apagar o node, e precisamos ligar o próximo dele no anterior)
+                previousNode->next =
+                    node->next; // previousNode's next receives the node's next
+                                // (to reconnect the list after removal)
             }
-            else // Caso seja a head
+            else // If at the head
             {
-                list->head = node->next; // Ele define o próximo node como a head (ja que vamos apagar a head)
+                list->head = node->next; // Sets next node as head (since head
+                                         // is being removed)
             }
-            if (node->next == NULL) // E caso o node next seja null (estamos na tail)
+            if (node->next == NULL) // If node's next is null (at the tail)
             {
-                list->tail = previousNode; // O anterior ao node vai ser a tail
+                list->tail = previousNode; // Previous node becomes the tail
             }
-            if (free_element != NULL) // Caso free_element exista
+            if (free_element != NULL) // If free_element is not NULL
             {
-                free_element(node->element); // Limpamos o elemento
+                free_element(node->element); // Cleans the element
             }
-            Node nextNode = node->next; // Guardamos o próximo node em uma variável temporária
-            free(node);                 // Damos free da node pretendida
-            node = nextNode;            // Movemos a node para o próximo
-            list->size--;               // Diminuimos o tamanho da lista
+            Node nextNode =
+                node->next;  // Saves the next node in a temporary variable
+            free(node);      // Frees the target node
+            node = nextNode; // Moves to the next node
+            list->size--;    // Decrements list size
         }
-        else // Caso a verificação seja errada
+        else // If the condition is not met
         {
-            previousNode = node; // previousNode vai ser igual ao node
-            node = node->next;   // E o node anda para frente
+            previousNode = node; // previousNode becomes the current node
+            node = node->next;   // Node advances forward
         }
     }
     return occurrences;
 }
 
-int list_remove_duplicates(List list, bool (*equal_element)(void *, void *), void (*free_element)(void *), void *element) // O(n)
+int list_remove_duplicates(
+    List list,
+    bool (*equal_element)(void*, void*),
+    void (*free_element)(void*),
+    void* element
+) // O(n)
 {
-    int occurrences = 0;      // Inicia o contador de ocorrencias do elemento
-    Node node = list->head;   // Recebe o endereço da head
-    Node previousNode = NULL; // Vai servir mais pra frente para guardar o node anterior
-    while (node != NULL)      // Percorre toda a lista
+    int occurrences = 0;      // Initializes occurrence counter
+    Node node = list->head;   // Receives the head address
+    Node previousNode = NULL; // Will be used later to track the previous node
+    while (node != NULL)      // Traverses the entire list
     {
-        if (equal_element(node->element, element)) // Se o node atual for igual ao elemento
+        if (equal_element(
+                node->element, element
+            )) // If current node equals the element
         {
-            occurrences++; // Ele acrescenta no contador
+            occurrences++; // Increments the counter
             if (occurrences > 1)
             {
-                previousNode->next = node->next; // o next do previousNode vai receber o próximo do node (tirei o if pois nunca vou apagar a head)
-                if (node->next == NULL)          // E caso o node next seja null (estamos na tail)
+                previousNode->next =
+                    node->next; // previousNode's next receives the node's next
+                                // (no if needed since head is never removed
+                                // here)
+                if (node->next == NULL) // If node's next is null (at the tail)
                 {
-                    list->tail = previousNode; // O anterior ao node vai ser a tail
+                    list->tail = previousNode; // Previous node becomes the tail
                 }
-                if (free_element != NULL) // Caso free_element exista
+                if (free_element != NULL) // If free_element is not NULL
                 {
-                    free_element(node->element); // Limpamos o elemento
+                    free_element(node->element); // Cleans the element
                 }
-                Node nextNode = node->next; // Guardamos o próximo node em uma variável temporária
-                free(node);                 // Damos free da node pretendida
-                node = nextNode;            // Movemos a node para o próximo
-                list->size--;               // Diminuimos o tamanho da lista
+                Node nextNode =
+                    node->next;  // Saves the next node in a temporary variable
+                free(node);      // Frees the target node
+                node = nextNode; // Moves to the next node
+                list->size--;    // Decrements list size
             }
         }
-        else // Caso a verificação seja errada
+        else // If the condition is not met
         {
-            previousNode = node; // previousNode vai ser igual ao node
-            node = node->next;   // E o node anda para frente
+            previousNode = node; // previousNode becomes the current node
+            node = node->next;   // Node advances forward
         }
     }
-    return occurrences - 1; // Retorna apenas as ocorrencias após a primeira
+    return occurrences - 1; // Returns only the occurrences after the first
 }
 
 List list_join(List list1, List list2) // O(n)
 {
-    List list = list_create(); // Cria a nova lista
-    Node node = list1->head;   // node recebe o endereço da head da lista 1
-    while (node != NULL)       // Percorre toda a lista 1 adicionando os elementos para a nova lista
+    List list = list_create(); // Creates the new list
+    Node node = list1->head;   // Node receives head address of list 1
+    while (node != NULL) // Traverses list 1 adding elements to the new list
     {
-        list_insert_last(list, node->element); // Insere o elemento na lista
-        node = node->next;                     // Anda para o próximo
+        list_insert_last(list, node->element); // Inserts element into list
+        node = node->next;                     // Moves to the next
     }
-    node = list2->head;  // node recebe o endereço da head da lista 2
-    while (node != NULL) // Percorre toda a lista 2 adicionando os elementos para a nova lista
+    node = list2->head;  // Node receives head address of list 2
+    while (node != NULL) // Traverses list 2 adding elements to the new list
     {
-        list_insert_last(list, node->element); // Insere o elemento na lista
-        node = node->next;                     // Anda para o próximo
+        list_insert_last(list, node->element); // Inserts element into list
+        node = node->next;                     // Moves to the next
     }
     return list;
 }
 
-void list_print(List list, void (*print_element)(void *element)) // O(n)
+void list_print(List list, void (*print_element)(void* element)) // O(n)
 {
-    Node node = list->head; // Recebe o endereço da head
-    while (node != NULL)    // Percorre toda a lista
+    Node node = list->head; // Receives the head address
+    while (node != NULL)    // Traverses the entire list
     {
-        print_element(node->element); // Printa o elemento do node atual
-        node = node->next;            // Anda para o próximo
+        print_element(node->element); // Prints the current node's element
+        node = node->next;            // Moves to the next
     }
 }
 
 List list_get_sublist_between(List list, int start_idx, int end_idx) // O(n)
 {
-    if (start_idx < 0 || start_idx > list_size(list) - 1 || end_idx < 0 || end_idx > list_size(list) - 1) // Caso os indices sejam invalidos
+    if (start_idx < 0 || start_idx > list_size(list) - 1 || end_idx < 0 ||
+        end_idx > list_size(list) - 1) // If indices are invalid
     {
         return NULL;
     }
-    List newlist = list_create();       // Crio uma nova lista
-    Node node = list->head;             // Recebe o endereço da minha lista recebida
-    for (int i = 0; i < start_idx; i++) // Percorro até o start_idx da lista recebida
+    List newlist = list_create(); // Creates a new list
+    Node node = list->head;       // Receives the address of the given list
+    for (int i = 0; i < start_idx;
+         i++) // Traverses to start_idx of the given list
     {
-        node = node->next; // Anda para o próximo
+        node = node->next; // Moves to the next
     }
-    for (int i = start_idx; i <= end_idx; i++) // Quando chego no meu start_idx, vou até meu end_idx (já foi corrigida a diferença de índice no loop de cima, então posso usar o <=)
+    for (int i = start_idx; i <= end_idx;
+         i++) // Once at start_idx, iterate to end_idx (index offset already
+              // corrected in the loop above, so <= can be used)
     {
-        list_insert_last(newlist, node->element); // Insere o elemento do atual na minha nova lista
-        node = node->next;                        // Anda para o próximo
+        list_insert_last(
+            newlist, node->element
+        );                 // Inserts current element into the new list
+        node = node->next; // Moves to the next
     }
-    return newlist; // Retorno a nova lista
+    return newlist; // Returns the new list
 }
 
 List list_get_sublist(List list, int indexes[], int count) // O(n)
 {
-    List newlist = list_create();                        // Cria minha nova lista
-    bool *index = calloc(list_size(list), sizeof(bool)); // Criamos um array de booleanos do tamanho da lista (Usamos calloc para definir o espaço alocado como zero, que em booleano vai significar false)
-    for (int i = 0; i < count; i++)                      // Percorre os elementos da array indexes
+    List newlist = list_create(); // Creates the new list
+    bool* index = calloc(
+        list_size(list), sizeof(bool)
+    ); // Creates a boolean array of list size (calloc initializes allocated
+       // space to zero, which means false for booleans)
+    for (int i = 0; i < count; i++) // Traverses elements of the indexes array
     {
         if (indexes[i] >= 0 && indexes[i] <= list_size(list) - 1)
         {
-            index[indexes[i]] = true; // E para cada posição que mostra o array indexes, colocamos true no nosso array de booleanos
+            index[indexes[i]] = true; // Sets true in the boolean array for each
+                                      // position indicated by indexes
         }
     }
-    Node node = list->head;                         // Recebe o endereço da head
-    int j = 0;                                      // Vamos usar essa váriavel para contabilizar o número necessário de passadas na lista (se o tamanho do array indexes terminar, não vale a pena continuar rodando)
-    for (int i = 0; node != NULL && j < count; i++) // Percorre a lista até onde seja necessário (só é necessario até o momento em que j>=count)
+    Node node = list->head; // Receives the head address
+    int j = 0; // Tracks the number of necessary passes through the list (stops
+               // once all indexed elements are found)
+    for (int i = 0; node != NULL && j < count;
+         i++) // Traverses the list only as far as necessary (stops when j >=
+              // count)
     {
-        if (index[i]) // Se na posição i o elemento do array for true
+        if (index[i]) // If the element at position i in the boolean array is
+                      // true
         {
-            list_insert_last(newlist, node->element); // O nosso novo array recebe o elemento da posição
-            j++;                                      // Acrescenta um valor para j
+            list_insert_last(
+                newlist, node->element
+            );   // Adds the element at the position to the new list
+            j++; // Increments j
         }
-        node = node->next; // Anda para frente
+        node = node->next; // Moves forward
     }
-    free(index);    // Limpamos o array de booleanos
-    return newlist; // Retorna a nova lista
+    free(index);    // Frees the boolean array
+    return newlist; // Returns the new list
 }
 
-List list_map(List list, void *(*func)(void *)) // O(n)
+List list_map(List list, void* (*func)(void*)) // O(n)
 {
-    List newlist = list_create(); // Cria uma nova lista
-    Node node = list->head;       // Recebe o endereço da head
-    while (node != NULL)          // Percorre toda a lista
+    List newlist = list_create(); // Creates a new list
+    Node node = list->head;       // Receives the head address
+    while (node != NULL)          // Traverses the entire list
     {
-        list_insert_last(newlist, func(node->element)); // Insere o elemento modificado pela função na lista
-        node = node->next;                              // Anda para o próximo
+        list_insert_last(
+            newlist, func(node->element)
+        ); // Inserts the element modified by the function into the list
+        node = node->next; // Moves to the next
     }
     return newlist;
 }
 
-List list_filter(List list, bool (*func)(void *)) // O(n)
+List list_filter(List list, bool (*func)(void*)) // O(n)
 {
-    List newlist = list_create(); // Cria a lista
-    Node node = list->head;       // Recebe o endereço da head
-    while (node != NULL)          // Percorre toda a lista
+    List newlist = list_create(); // Creates the list
+    Node node = list->head;       // Receives the head address
+    while (node != NULL)          // Traverses the entire list
     {
-        if (func(node->element)) // Se a função retornar true para o elemento do node
+        if (func(
+                node->element
+            )) // If the function returns true for the node's element
         {
-            list_insert_last(newlist, node->element); // Insere esse elemento na lista
+            list_insert_last(
+                newlist, node->element
+            ); // Inserts this element into the list
         }
-        node = node->next; // Anda para o próximo
+        node = node->next; // Moves to the next
     }
     return newlist;
 }
 
-// Iteradores
+// Iterators
 
 void list_iterator_start(List list) // O(1)
 {
-    list->current = list->head; // O current recebe o endereço da head
+    list->current = list->head; // Current receives the head address
 }
 
 bool list_iterator_has_next(List list) // O(1)
 {
-    return list->current != NULL; // Se o current for diferente de NULL, ele tem um próximo
+    return list->current !=
+           NULL; // If current is not NULL, there is a next element
 }
 
-void *list_iterator_get_next(List list) // O(1)
+void* list_iterator_get_next(List list) // O(1)
 {
-    void *element = list->current->element; // Guarda o endereço do elemento
-    list->current = list->current-> next; // Anda para o próximo
-    return element; // Retorna o elemento
+    void* element = list->current->element; // Saves the element address
+    list->current = list->current->next;    // Moves to the next
+    return element;                         // Returns the element
 }
