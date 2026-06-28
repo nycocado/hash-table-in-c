@@ -71,14 +71,16 @@ void* list_get_last(List list);
 void* list_get(List list, int position);
 
 /**
- * @brief Returns the position in the list of the first occurrence of the specified element.
+ * @brief Returns the position in the list of the first occurrence of the
+ * specified element.
  *
  * Returns -1 if the specified element does not occur in the list.
  *
  * @param list The linked list.
  * @param equal The function to compare two elements.
  * @param element The element to search for.
- * @return int The position in the list of the first occurrence of the specified element, or -1 if the specified element does not occur in the list.
+ * @return int The position in the list of the first occurrence of the specified
+ * element, or -1 if the specified element does not occur in the list.
  */
 int list_find(List list, bool (*equal)(void*, void*), void* element);
 
@@ -165,7 +167,8 @@ void list_to_array(List list, void** out_array);
 int list_count_all(List list, bool (*equal)(void*, void*), void* element);
 
 /**
- * @brief Removes all occurrences of an element, and returns the number of occurrences.
+ * @brief Removes all occurrences of an element, and returns the number of
+ * occurrences.
  *
  * @param list The linked list.
  * @param equal_element The function to compare two elements.
@@ -173,7 +176,12 @@ int list_count_all(List list, bool (*equal)(void*, void*), void* element);
  * @param element The element to search for.
  * @return int The number of occurrences on an element.
  */
-int list_remove_all(List list, bool (*equal_element)(void*, void*), void (*free_element)(void*), void* element);
+int list_remove_all(
+    List list,
+    bool (*equal_element)(void*, void*),
+    void (*free_element)(void*),
+    void* element
+);
 
 /**
  * @brief Removes all duplicate occurrences of an element.
@@ -186,7 +194,12 @@ int list_remove_all(List list, bool (*equal_element)(void*, void*), void (*free_
  * @param element The element to search for.
  * @return int The number of occurrences on an element.
  */
-int list_remove_duplicates(List list, bool (*equal_element)(void*, void*), void (*free_element)(void*), void* element);
+int list_remove_duplicates(
+    List list,
+    bool (*equal_element)(void*, void*),
+    void (*free_element)(void*),
+    void* element
+);
 
 /**
  * @brief Returns the result from the join of two lists.
@@ -218,45 +231,51 @@ void list_print(List list, void (*print_element)(void* element));
 List list_get_sublist_between(List list, int start_idx, int end_idx);
 
 /**
- * @brief Returns a list with the elements in the given array of unordered indexes.
+ * @brief Returns a list with the elements in the given array of unordered
+ * indexes.
  *
  * Returns the size of the array in the out parameter count.
  *
  * @param list The linked list.
  * @param indexes The array of unordered indexes.
  * @param count The size of the array.
- * @return List A list with the elements in the given array of unordered indexes.
+ * @return List A list with the elements in the given array of unordered
+ * indexes.
  */
 List list_get_sublist(List list, int indexes[], int count);
 
 /**
- * @brief Returns a list with the result of the execution of the function func with each element of the list as parameter.
+ * @brief Returns a list with the result of the execution of the function func
+ * with each element of the list as parameter.
  *
  * @param list The linked list.
  * @param func The function to apply to each element of the list.
- * @return List A list with the result of the execution of the function func with each element of the list as parameter.
+ * @return List A list with the result of the execution of the function func
+ * with each element of the list as parameter.
  */
 List list_map(List list, void* (*func)(void*));
 
 /**
- * @brief Returns a list with the elements that return true when applied with the given function.
+ * @brief Returns a list with the elements that return true when applied with
+ * the given function.
  *
  * @param list The linked list.
  * @param func The boolean function to apply to each element of the list.
- * @return List A list with the elements that return true when applied with the given function.
+ * @return List A list with the elements that return true when applied with the
+ * given function.
  */
 List list_filter(List list, bool (*func)(void*));
 
 /**
  * @brief Starts the iterator.
- * 
+ *
  * @param list The linked list.
  */
 void list_iterator_start(List list);
 
 /**
  * @brief Returns true iff there are more elements to iterate.
- * 
+ *
  * @param list The linked list.
  * @return bool true iff there are more elements to iterate.
  */
@@ -264,7 +283,7 @@ bool list_iterator_has_next(List list);
 
 /**
  * @brief Returns the next element in the iteration.
- * 
+ *
  * @param list The linked list.
  * @return void* The next element in the iteration.
  */
